@@ -16,6 +16,8 @@ bool Interpreter::parse(std::istream & input) noexcept
 	getline(input, UnformattedLine);
 	FormattedLine = StringFormat(UnformattedLine);
 	ParsedData = StringSplit(FormattedLine);
+	if (ParsedData.size() == 0)
+		return false;
 	int ParaCount = 0;
 	for (size_t i = 0; i < ParsedData.size(); i++)
 	{
