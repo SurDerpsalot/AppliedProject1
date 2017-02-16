@@ -2,7 +2,7 @@
 #define INTERPRETER_H
 #include "tokenize.hpp"
 struct Node {
-	std::string Process;
+	std::string Data;
 	std::vector<Node *> Branch;
 
 };

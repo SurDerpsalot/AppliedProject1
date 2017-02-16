@@ -32,22 +32,43 @@ bool Interpreter::parse(std::istream & input) noexcept
 	}
 	if (ParaCount != 0)
 		return false;
-
+	BuildTree(ParsedData);
 	return true;
 }
 
-void Interpreter::InsertNode(Node * curLevel)
-{
-
+void traversePost(Node * curLevel) {
+	if (curLevel == nullptr) {
+		return;
+	}
+	else {
+		//this output being here is pre-order
+		for (size_t childIndex = 0; childIndex < curLevel->Branch.size(); childIndex++) {
+			traversePost(curLevel->Branch[childIndex]);
+		}
+		std::cout << curLevel->Data << std::endl;//if the output is being made here, it is post-order
+	}
 }
 
 void Interpreter::BuildTree(std::vector<token> ParsedData)
 {
-	Root = new Node;
-
-
-
-
-
-
+	if (Root == NULL)
+		Root = new Node;
+	Node* NewNode;
+	for (size_t i = 0; i < ParsedData.size(); i++)
+	{
+		if (ParsedData.at(i) != "(" || ParsedData.at(i) != ")")
+		{
+			if (ParsedData.at(i) == "begin")
+			{
+				Root->Data = ParsedData.at(i);
+			}
+			else
+			{
+				NewNode = new Node;
+				NewNode->Data = ParsedData.at(i);
+				Root->Branch.push_back(NewNode);
+			}
+		}
+	}
+	traversePost(Root);
 }
