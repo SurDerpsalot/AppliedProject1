@@ -6,7 +6,7 @@
 
 TEST_CASE("Test Interpreter parser with expected input", "[interpreter]") {
 
-	std::string program = "(begin (define r 10) (* pi (* r r)))";
+	std::string program = "(begin (define r 11) (* pi (* r r)))";
 
 	std::istringstream iss(program);
 
@@ -37,7 +37,6 @@ TEST_CASE("Test Interpreter parser with truncated input", "[interpreter]") {
 		REQUIRE(ok == false);
 	}
 }
-
 TEST_CASE("Test Interpreter parser with extra input", "[interpreter]") {
 
 	std::string program = "(begin (define r 10) (* pi (* r r))) )";

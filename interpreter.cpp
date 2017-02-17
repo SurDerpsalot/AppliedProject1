@@ -16,59 +16,99 @@ bool Interpreter::parse(std::istream & input) noexcept
 	getline(input, UnformattedLine);
 	FormattedLine = StringFormat(UnformattedLine);
 	ParsedData = StringSplit(FormattedLine);
-	if (ParsedData.size() == 0)
+	if (!checkBasicInput(ParsedData))
 		return false;
-	int ParaCount = 0;
-	for (size_t i = 0; i < ParsedData.size(); i++)
+	else
 	{
-		if (ParsedData.at(i) == "(")
+		size_t i = 0;
+		BuildTree(ParsedData, i, Root);
+		return true;
+	}
+}
+
+bool Interpreter::checkBasicInput(std::vector<token> & input) 
+{
+	if (input.size() <=2)
+	{
+		std::cout << "Encountered Parse Error." << std::endl;
+		return false;
+	}
+	int ParaCount = 0;
+	for (size_t i = 0; i < input.size(); i++)
+	{
+		if (input.at(i) == "(")
 		{
 			ParaCount++;
-			if (ParsedData.at(i + 1) == ")" || ParsedData.at(i + 1) == "(")
+			if (input.at(i + 1) == ")" || input.at(i + 1) == "(")
+			{
+				std::cout << "Encountered Parse Error." << std::endl;
 				return false;
+			}
 		}
-		else if (ParsedData.at(i) == ")")
+		else if (input.at(i) == ")")
 			ParaCount--;
 	}
-	if (ParaCount != 0)
+	if (ParaCount == 0)
+	{
+		return checkNumInput(input);
+	}
+	else
+	{
+		std::cout << "Encountered Parse Error." << std::endl;
 		return false;
-	BuildTree(ParsedData);
+	}
+}
+
+bool Interpreter::checkNumInput(std::vector<std::string> & input) {
+	token number;
+	bool num;
+	num = false;
+	for (size_t i = 0; i < input.size(); i++)
+	{
+		number = input.at(i);
+		for (size_t j = 0; j < number.length(); j++)
+		{
+			if (num)
+			{
+				if (!isdigit(number[j]) && number[j] != '.')
+					return false;
+			}
+			if (isdigit(number[j]))
+				num = true;
+		}
+		num = false;
+	}
 	return true;
 }
 
-void traversePost(Node * curLevel) {
-	if (curLevel == nullptr) {
-		return;
-	}
-	else {
-		//this output being here is pre-order
-		for (size_t childIndex = 0; childIndex < curLevel->Branch.size(); childIndex++) {
-			traversePost(curLevel->Branch[childIndex]);
-		}
-		std::cout << curLevel->Data << std::endl;//if the output is being made here, it is post-order
-	}
-}
-
-void Interpreter::BuildTree(std::vector<token> ParsedData)
+bool Interpreter::BuildTree(std::vector<token> ParsedData, size_t & i, Node * currentLevel)
 {
 	if (Root == NULL)
-		Root = new Node;
-	Node* NewNode;
-	for (size_t i = 0; i < ParsedData.size(); i++)
 	{
-		if (ParsedData.at(i) != "(" || ParsedData.at(i) != ")")
+		Root = new Node;
+		Root->Data = ParsedData.at(i + 1);
+		i = i + 2;
+		currentLevel = Root;
+	}
+	Node * NewNode;
+	for (i; i < ParsedData.size(); i++)
+	{
+		if (ParsedData.at(i) == "(")
 		{
-			if (ParsedData.at(i) == "begin")
-			{
-				Root->Data = ParsedData.at(i);
-			}
-			else
-			{
-				NewNode = new Node;
-				NewNode->Data = ParsedData.at(i);
-				Root->Branch.push_back(NewNode);
-			}
+			NewNode = new Node;
+			NewNode->Data = ParsedData.at(i + 1);
+			i = i + 2;
+			currentLevel->Branch.push_back(NewNode);
+			BuildTree(ParsedData, i, NewNode);
+		}
+		else if (ParsedData.at(i) == ")")
+			return true;
+		else
+		{
+			NewNode = new Node;
+			NewNode->Data = ParsedData.at(i);
+			currentLevel->Branch.push_back(NewNode);
 		}
 	}
-	traversePost(Root);
+	return true;
 }

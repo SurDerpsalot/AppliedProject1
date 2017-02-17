@@ -21,14 +21,15 @@ public:
 	// throws InterpreterSemanticError if a semantic error is encountered
 	// the exception message string should document the nature of the semantic error 
 	//Expression eval();
-	
-	void InsertNode(Node * curLevel);
 
-	void BuildTree(std::vector<std::string> ParsedData);
+	bool checkBasicInput(std::vector<std::string> & input);
+	bool checkNumInput(std::vector<std::string> & input);
+
+	bool BuildTree(std::vector<std::string> ParsedData, size_t &i, Node * currentLevel);
 
 private:
 	Node* Root;
-
+	Node* CurLvl;
 };
 
 #endif
