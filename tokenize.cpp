@@ -16,6 +16,14 @@ token StringFormat(token Unformatted)
 			Unformatted.insert(i, " ");
 			i++;
 		}
+		else if (Unformatted.at(i) == ';')
+		{
+			Unformatted.insert(i, " ");
+			for (i; i < Unformatted.size(); i++)
+			{
+				Unformatted.erase(i);
+			}
+		}
 	}
 	return Unformatted;
 }
