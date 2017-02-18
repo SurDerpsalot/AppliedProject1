@@ -81,22 +81,24 @@ bool Interpreter::checkNumInput(std::vector<std::string> & input) {
 	return true;
 }
 
-bool Interpreter::BuildTree(std::vector<token> ParsedData, size_t & i, Node * currentLevel)
+bool Interpreter::BuildTree(std::vector<token> ParsedData, size_t & i, Expression * currentLevel)
 {
 	if (Root == NULL)
 	{
-		Root = new Node;
-		Root->Data = ParsedData.at(i + 1);
+		Root = new Expression;
+		Root->Node.type = Symbol;
+		Root->Node.string_value = ParsedData.at(i + 1);
 		i = i + 2;
 		currentLevel = Root;
 	}
-	Node * NewNode;
+	Expression * NewNode;
 	for (i; i < ParsedData.size(); i++)
 	{
 		if (ParsedData.at(i) == "(")
 		{
-			NewNode = new Node;
-			NewNode->Data = ParsedData.at(i + 1);
+			NewNode = new Expression;
+			NewNode->Node.type = Symbol;
+			NewNode->Node.string_value = ParsedData.at(i + 1);
 			i = i + 2;
 			currentLevel->Branch.push_back(NewNode);
 			BuildTree(ParsedData, i, NewNode);
@@ -111,4 +113,9 @@ bool Interpreter::BuildTree(std::vector<token> ParsedData, size_t & i, Node * cu
 		}
 	}
 	return true;
+}
+
+Expression eval() 
+{
+
 }

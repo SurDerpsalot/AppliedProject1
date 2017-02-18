@@ -1,11 +1,7 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 #include "tokenize.hpp"
-struct Node {
-	std::string Data;
-	std::vector<Node *> Branch;
-
-};
+#include "environment.hpp"
 
 class Interpreter {
 public:
@@ -20,16 +16,16 @@ public:
 	// Evaluate the current AST and return the resulting Expression
 	// throws InterpreterSemanticError if a semantic error is encountered
 	// the exception message string should document the nature of the semantic error 
-	//Expression eval();
+	Expression eval();
 
 	bool checkBasicInput(std::vector<std::string> & input);
 	bool checkNumInput(std::vector<std::string> & input);
 
-	bool BuildTree(std::vector<std::string> ParsedData, size_t &i, Node * currentLevel);
+	bool BuildTree(std::vector<std::string> ParsedData, size_t &i, Expression * currentLevel);
 
 private:
-	Node* Root;
-	Node* CurLvl;
+	Expression * Root;
+	Expression * CurLvl;
 };
 
 #endif
