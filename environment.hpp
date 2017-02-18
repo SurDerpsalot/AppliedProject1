@@ -1,17 +1,21 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 #include "string.h"
-#include "interpreter.hpp"
 #include "expression.hpp"
 #include <map>
-typedef std::map<Expression, Expression> MAP;
+
 class Environment {
 public:
+	typedef Expression(Environment::*FunctionPointer(Expression));
+	typedef std::map<std::string, FunctionPointer > MAP;
 	Environment();
-
-	void EnviroBuild(Node * Top);
-
-	Expression EnviroAccess(Node*Top);
+	void EnviroBuild();
+	Expression Operations(Expression * Top);
+	Expression ProType(Expression * Top);
+	Expression EnviroAccess(Expression *Top, size_t childIndex);
+	Expression EnvDef(Expression*Top);
+	Expression EnvIf(Expression*Top);
+	Expression NonSpec(Expression*Top);
 
 private:
 	MAP Express;
