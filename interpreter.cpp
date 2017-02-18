@@ -97,8 +97,7 @@ bool Interpreter::BuildTree(std::vector<token> ParsedData, size_t & i, Expressio
 		if (ParsedData.at(i) == "(")
 		{
 			NewNode = new Expression;
-			NewNode->Node.type = Symbol;
-			NewNode->Node.string_value = ParsedData.at(i + 1);
+			Store(ParsedData.at(i + 1), NewNode);
 			i = i + 2;
 			currentLevel->Node.Branch.push_back(NewNode);
 			BuildTree(ParsedData, i, NewNode);
@@ -108,14 +107,61 @@ bool Interpreter::BuildTree(std::vector<token> ParsedData, size_t & i, Expressio
 		else
 		{
 			NewNode = new Expression;
-			NewNode->Node.type = Symbol;
+			Store(ParsedData.at(i), NewNode);
 			currentLevel->Node.Branch.push_back(NewNode);
 		}
 	}
 	return true;
 }
 
-Expression eval() 
+void Interpreter::Store(std::string input, Expression * node)
+{
+	if (input == "true")
+	{
+		node->Node.type = Bool;
+		node->Node.bool_value = true;
+	}
+	else if (input == "false")
+	{
+		node->Node.type = Bool;
+		node->Node.bool_value = false;
+	}
+	else
+		StoreNum(input, node);
+}
+
+void Interpreter::StoreNum(std::string input, Expression * node)
+{
+	bool num = false;
+	for (size_t j = 0; j < input.length(); j++)
+	{
+		if (num)
+		{
+			if (!isdigit(input[j]) && input[j] != '.')
+			{
+				num = false;
+				break;
+			}
+		}
+		if (isdigit(input[j]))
+			num = true;
+	}
+	if (num)
+	{
+		node->Node.type = Value;
+		node->Node.double_value = std::stoi(input);
+	}
+	else
+		StoreSymbol(input, node);
+}
+
+void Interpreter::StoreSymbol(std::string input, Expression *node)
+{
+	node->Node.type = Symbol;
+	node->Node.string_value = input;
+}
+
+/*Expression eval() 
 {
 
-}
+}*/

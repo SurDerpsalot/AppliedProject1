@@ -13,7 +13,7 @@ Expression::Expression(bool value) {
 	Node.bool_value = value;
 	Node.double_value = NULL;
 	Node.string_value = "";
-	std::vector<Expression* > Branch;
+
 }
 
 Expression::Expression(double value) {
@@ -21,7 +21,13 @@ Expression::Expression(double value) {
 	Node.bool_value = NULL;
 	Node.double_value = value;
 	Node.string_value = "";
-	std::vector<Expression* > Branch;
+}
+
+Expression::Expression(int value) {
+	Node.type = Value;
+	Node.bool_value = NULL;
+	Node.double_value = value;
+	Node.string_value = "";
 }
 
 Expression::Expression(const std::string & value) {
@@ -29,10 +35,12 @@ Expression::Expression(const std::string & value) {
 	Node.bool_value = NULL;
 	Node.double_value = NULL;
 	Node.string_value = value;
-	std::vector<Expression* > Branch;
 }
 
 bool Expression::operator==(const Expression & exp) const noexcept 
 {
-
+	if ((Node.type == exp.Node.type) && (Node.Branch.size() == exp.Node.Branch.size()))
+		return true;
+	else
+		return false;
 }
