@@ -100,16 +100,16 @@ bool Interpreter::BuildTree(std::vector<token> ParsedData, size_t & i, Expressio
 			NewNode->Node.type = Symbol;
 			NewNode->Node.string_value = ParsedData.at(i + 1);
 			i = i + 2;
-			currentLevel->Branch.push_back(NewNode);
+			currentLevel->Node.Branch.push_back(NewNode);
 			BuildTree(ParsedData, i, NewNode);
 		}
 		else if (ParsedData.at(i) == ")")
 			return true;
 		else
 		{
-			NewNode = new Node;
-			NewNode->Data = ParsedData.at(i);
-			currentLevel->Branch.push_back(NewNode);
+			NewNode = new Expression;
+			NewNode->Node.type = Symbol;
+			currentLevel->Node.Branch.push_back(NewNode);
 		}
 	}
 	return true;
