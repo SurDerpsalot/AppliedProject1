@@ -13,7 +13,6 @@ public:
 	bool checkProcedure(Expression Target);
 	Expression Operations(Expression  Top);
 	Expression ProType(Expression  Top);
-	Expression EnviroAccess(Expression Top, size_t childIndex);
 	Expression EnvDef(Expression Top);
 	Expression EnvIf(Expression Top);
 	Expression NonSpec(Expression Top);

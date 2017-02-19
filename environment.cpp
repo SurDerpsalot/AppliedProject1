@@ -213,61 +213,520 @@ Expression Environment::NonSpec(Expression Top)
 	}
 }
 
-Expression EnvNot(Expression Top) 
+Expression Environment::EnvNot(Expression Top) 
 {
+	Expression Temp;
+	Expression Done;
+	if (Top.Node.Branch.size() == 1)
+	{
+		Temp = Top.Node.Branch.at(0);
+		if (Temp.Node.type == Symbol)
+			Temp = ProType(Temp);
+
+		if (Temp.Node.type == Bool)
+		{
+			Done = Temp;
+			if (Temp.Node.bool_value)
+				Done.Node.bool_value = false;
+			else
+				Done.Node.bool_value = true;
+			return Done;
+		}
+		else if (Temp.Node.type == Value)
+		{
+			InterpreterSemanticError("Error: Values cannot be logically negated");
+			return Error;
+		}
+	}
+	else
+	{
+		InterpreterSemanticError("Error: Too many/too few arguments for 'not' procedure");
+		return Error;
+	}
+}
+
+Expression Environment::EnvMinus(Expression Top)
+{
+	Expression Ex1;
+	Expression Ex2;
+	Expression done;
+	if (Top.Node.Branch.size() == 1)
+	{
+		Ex1 = Top.Node.Branch.at(0);
+		if (Ex1.Node.type == Symbol)
+			Ex1 = ProType(Ex1);
+		if (Ex1.Node.type == Bool)
+		{
+			InterpreterSemanticError("Error: Cannot make a bool negative in this procedure");
+			return Error;
+		}
+		else if (Ex1.Node.type == Value)
+		{
+			done = Ex1;
+			done.Node.double_value = 1 - done.Node.double_value;
+			return done;
+		}
+	}
+	else if (Top.Node.Branch.size() == 2)
+	{
+		Ex1 = Top.Node.Branch.at(0);
+		Ex2 = Top.Node.Branch.at(1);
+		if (Ex1.Node.type == Symbol)
+			Ex1 = ProType(Ex1);
+		if (Ex2.Node.type == Symbol)
+			Ex2 = ProType(Ex2);
+		if (Ex1.Node.type == Bool)
+		{
+			InterpreterSemanticError("Error: Cannot subtract bools");
+			return Error;
+		}
+		else if (Ex1.Node.type == Value)
+		{
+			if (Ex2.Node.type == Bool)
+			{
+				InterpreterSemanticError("Error: Cannot subtract bools");
+				return Error;
+			}
+			else if (Ex2.Node.type == Value)
+			{
+				done = Ex1.Node.double_value - Ex2.Node.double_value;
+				return done;
+			}
+		}
+	}
 
 }
 
-Expression EnvMinus(Expression Top) 
+Expression Environment::EnvMult(Expression Top)
 {
-
+	Expression Ex1;
+	Expression Product(1.0);
+	for (size_t i = 0; i < Top.Node.Branch.size(); i++)
+	{
+		Ex1 = Top.Node.Branch.at(i);
+		if (Ex1.Node.type == Symbol)
+		{
+			Ex1 = ProType(Ex1);
+		}
+		if (Ex1.Node.type == Bool)
+		{
+			InterpreterSemanticError("Error: cannot multiply a Bool");
+			return Error;
+		}
+		else if (Ex1.Node.type == Value)
+		{
+			Product.Node.double_value = Product.Node.double_value * Ex1.Node.double_value;
+		}
+	}
+	return Product;
 }
 
-Expression EnvMult(Expression Top)
+Expression Environment::EnvAnd(Expression Top)
 {
-
+	Expression Ex1;
+	Expression Ex2;
+	Expression Final(true);
+	if (Top.Node.Branch.size() < 2)
+	{
+		InterpreterSemanticError("Error: To few arguments. Must have a minimum of two");
+		return Error;
+	}
+	Ex1 = Top.Node.Branch.at(0);
+	for (size_t i = 1; i < Top.Node.Branch.size(); i++)
+	{
+		Ex2 = Top.Node.Branch.at(i);
+		if (Ex1.Node.type == Symbol)
+			Ex1 = ProType(Ex1);
+		if (Ex2.Node.type == Symbol)
+			Ex2 = ProType(Ex2);
+		if (Ex1.Node.type == Value)
+		{
+			InterpreterSemanticError("Error: Doesn't accept number arguments");
+			return Error;
+		}
+		else if (Ex1.Node.type == Bool)
+		{
+			if (Ex2.Node.type == Value)
+			{
+				InterpreterSemanticError("Error: Doesn't accept number arguments");
+				return Error;
+			}
+			else if (Ex2.Node.type == Bool)
+				Final.Node.bool_value = Ex2.Node.bool_value && Ex2.Node.bool_value && Final.Node.bool_value;
+		}
+	}
 }
 
-Expression EnvAnd(Expression Top)
+Expression Environment::EnvOr(Expression Top)
 {
-
+	Expression Ex1;
+	Expression Ex2;
+	Expression Final(true);
+	if (Top.Node.Branch.size() < 2)
+	{
+		InterpreterSemanticError("Error: To few arguments. Must have a minimum of two");
+		return Error;
+	}
+	Ex1 = Top.Node.Branch.at(0);
+	for (size_t i = 1; i < Top.Node.Branch.size(); i++)
+	{
+		Ex2 = Top.Node.Branch.at(i);
+		if (Ex1.Node.type == Symbol)
+			Ex1 = ProType(Ex1);
+		if (Ex2.Node.type == Symbol)
+			Ex2 = ProType(Ex2);
+		if (Ex1.Node.type == Value)
+		{
+			InterpreterSemanticError("Error: Doesn't accept number arguments");
+			return Error;
+		}
+		else if (Ex1.Node.type == Bool)
+		{
+			if (Ex2.Node.type == Value)
+			{
+				InterpreterSemanticError("Error: Doesn't accept number arguments");
+				return Error;
+			}
+			else if (Ex2.Node.type == Bool)
+				Final.Node.bool_value = Ex2.Node.bool_value || Ex2.Node.bool_value || Final.Node.bool_value;
+		}
+	}
 }
 
-Expression EnvAdd(Expression Top)
+Expression Environment::EnvAdd(Expression Top)
 {
-
+	Expression Ex1;
+	Expression Sum(0);
+	for (size_t i = 0; i < Top.Node.Branch.size(); i++)
+	{
+		Ex1 = Top.Node.Branch.at(i);
+		if (Ex1.Node.type == Symbol)
+		{
+			Ex1 = ProType(Ex1);
+		}
+		if (Ex1.Node.type == Bool)
+		{
+			InterpreterSemanticError("Error: cannot add a Bool");
+			return Error;
+		}
+		else if (Ex1.Node.type == Value)
+		{
+			Sum.Node.double_value = Sum.Node.double_value + Ex1.Node.double_value;
+		}
+	}
+	return Sum;
 }
 
-Expression EnvOr(Expression Top)
+Expression Environment::EnvLes(Expression Top)
 {
-
+	Expression Ex1;
+	Expression Ex2;
+	Expression done;
+	if (Top.Node.Branch.size() < 2)
+	{
+		InterpreterSemanticError("Error: To few Arguments");
+		return Error;
+	}
+	else if (Top.Node.Branch.size() >2)
+	{
+		InterpreterSemanticError("Error: To many Arugments");
+		return Error;
+	}
+	else
+	{
+		Ex1 = Top.Node.Branch.at(0);
+		Ex2 = Top.Node.Branch.at(1);
+		if (Ex1.Node.type == Symbol)
+			Ex1 = ProType(Ex1);
+		if (Ex2.Node.type == Symbol)
+			Ex2 = ProType(Ex2);
+		if (Ex1.Node.type == Bool)
+		{
+			InterpreterSemanticError("Error: Cannot accept Boolean Arguments");
+			return Error;
+		}
+		else if (Ex1.Node.type == Value)
+		{
+			if (Ex2.Node.type == Bool)
+			{
+				InterpreterSemanticError("Error: Cannot accept Boolean Arguments");
+				return Error;
+			}
+			else if (Ex2.Node.type == Value)
+			{
+				if (Ex1.Node.double_value < Ex2.Node.double_value)
+				{
+					done.Node.bool_value = true;
+					done.Node.type = Bool;
+				}
+				else
+				{
+					done.Node.bool_value = false;
+					done.Node.type = Bool;
+				}
+				return done;
+			}
+		}
+	}
 }
 
-Expression EnvLes(Expression Top)
+Expression Environment::EnvLeq(Expression Top)
 {
-
+	Expression Ex1;
+	Expression Ex2;
+	Expression done;
+	if (Top.Node.Branch.size() < 2)
+	{
+		InterpreterSemanticError("Error: To few Arguments");
+		return Error;
+	}
+	else if (Top.Node.Branch.size() >2)
+	{
+		InterpreterSemanticError("Error: To many Arugments");
+		return Error;
+	}
+	else
+	{
+		Ex1 = Top.Node.Branch.at(0);
+		Ex2 = Top.Node.Branch.at(1);
+		if (Ex1.Node.type == Symbol)
+			Ex1 = ProType(Ex1);
+		if (Ex2.Node.type == Symbol)
+			Ex2 = ProType(Ex2);
+		if (Ex1.Node.type == Bool)
+		{
+			InterpreterSemanticError("Error: Cannot accept Boolean Arguments");
+			return Error;
+		}
+		else if (Ex1.Node.type == Value)
+		{
+			if (Ex2.Node.type == Bool)
+			{
+				InterpreterSemanticError("Error: Cannot accept Boolean Arguments");
+				return Error;
+			}
+			else if (Ex2.Node.type == Value)
+			{
+				if (Ex1.Node.double_value < Ex2.Node.double_value)
+				{
+					done.Node.bool_value = true;
+					done.Node.type = Bool;
+				}
+				else if (Ex1.Node.double_value == Ex2.Node.double_value)
+				{
+					done.Node.bool_value = true;
+					done.Node.type = Bool;
+				}
+				else
+				{
+					done.Node.bool_value = false;
+					done.Node.type = Bool;
+				}
+				return done;
+			}
+		}
+	}
 }
 
-Expression EnvLeq(Expression Top)
+Expression Environment::EnvGrt(Expression Top)
 {
-
+	Expression Ex1;
+	Expression Ex2;
+	Expression done;
+	if (Top.Node.Branch.size() < 2)
+	{
+		InterpreterSemanticError("Error: To few Arguments");
+		return Error;
+	}
+	else if (Top.Node.Branch.size() >2)
+	{
+		InterpreterSemanticError("Error: To many Arugments");
+		return Error;
+	}
+	else
+	{
+		Ex1 = Top.Node.Branch.at(0);
+		Ex2 = Top.Node.Branch.at(1);
+		if (Ex1.Node.type == Symbol)
+			Ex1 = ProType(Ex1);
+		if (Ex2.Node.type == Symbol)
+			Ex2 = ProType(Ex2);
+		if (Ex1.Node.type == Bool)
+		{
+			InterpreterSemanticError("Error: Cannot accept Boolean Arguments");
+			return Error;
+		}
+		else if (Ex1.Node.type == Value)
+		{
+			if (Ex2.Node.type == Bool)
+			{
+				InterpreterSemanticError("Error: Cannot accept Boolean Arguments");
+				return Error;
+			}
+			else if (Ex2.Node.type == Value)
+			{
+				if (Ex1.Node.double_value < Ex2.Node.double_value)
+				{
+					done.Node.bool_value = false;
+					done.Node.type = Bool;
+				}
+				else
+				{
+					done.Node.bool_value = true;
+					done.Node.type = Bool;
+				}
+				return done;
+			}
+		}
+	}
 }
 
-Expression EnvGrt(Expression Top)
+Expression Environment::EnvGeq(Expression Top)
 {
-
+	Expression Ex1;
+	Expression Ex2;
+	Expression done;
+	if (Top.Node.Branch.size() < 2)
+	{
+		InterpreterSemanticError("Error: To few Arguments");
+		return Error;
+	}
+	else if (Top.Node.Branch.size() >2)
+	{
+		InterpreterSemanticError("Error: To many Arugments");
+		return Error;
+	}
+	else
+	{
+		Ex1 = Top.Node.Branch.at(0);
+		Ex2 = Top.Node.Branch.at(1);
+		if (Ex1.Node.type == Symbol)
+			Ex1 = ProType(Ex1);
+		if (Ex2.Node.type == Symbol)
+			Ex2 = ProType(Ex2);
+		if (Ex1.Node.type == Bool)
+		{
+			InterpreterSemanticError("Error: Cannot accept Boolean Arguments");
+			return Error;
+		}
+		else if (Ex1.Node.type == Value)
+		{
+			if (Ex2.Node.type == Bool)
+			{
+				InterpreterSemanticError("Error: Cannot accept Boolean Arguments");
+				return Error;
+			}
+			else if (Ex2.Node.type == Value)
+			{
+				if (Ex1.Node.double_value > Ex2.Node.double_value)
+				{
+					done.Node.bool_value = true;
+					done.Node.type = Bool;
+				}
+				else if (Ex1.Node.double_value == Ex2.Node.double_value)
+				{
+					done.Node.bool_value = true;
+					done.Node.type = Bool;
+				}
+				else
+				{
+					done.Node.bool_value = false;
+					done.Node.type = Bool;
+				}
+				return done;
+			}
+		}
+	}
 }
 
-Expression EnvGeq(Expression Top)
+Expression Environment::EnvEq(Expression Top)
 {
-
+	Expression Ex1;
+	Expression Ex2;
+	Expression done;
+	if (Top.Node.Branch.size() < 2)
+	{
+		InterpreterSemanticError("Error: To few Arguments");
+		return Error;
+	}
+	else if (Top.Node.Branch.size() >2)
+	{
+		InterpreterSemanticError("Error: To many Arugments");
+		return Error;
+	}
+	else
+	{
+		Ex1 = Top.Node.Branch.at(0);
+		Ex2 = Top.Node.Branch.at(1);
+		if (Ex1.Node.type == Symbol)
+			Ex1 = ProType(Ex1);
+		if (Ex2.Node.type == Symbol)
+			Ex2 = ProType(Ex2);
+		if (Ex1.Node.type == Bool)
+		{
+			InterpreterSemanticError("Error: Cannot accept Boolean Arguments");
+			return Error;
+		}
+		else if (Ex1.Node.type == Value)
+		{
+			if (Ex2.Node.type == Bool)
+			{
+				InterpreterSemanticError("Error: Cannot accept Boolean Arguments");
+				return Error;
+			}
+			else if (Ex2.Node.type == Value)
+			{
+				else if (Ex1.Node.double_value == Ex2.Node.double_value)
+				{
+					done.Node.bool_value = true;
+					done.Node.type = Bool;
+				}
+				else
+				{
+					done.Node.bool_value = false;
+					done.Node.type = Bool;
+				}
+				return done;
+			}
+		}
+	}
 }
 
-Expression EnvEq(Expression Top)
+Expression Environment::EnvDiv(Expression Top)
 {
-
-}
-Expression EnvDiv(Expression Top)
-{
-
+	Expression Ex1;
+	Expression Ex2;
+	Expression done;
+	if (Top.Node.Branch.size() == 2)
+	{
+		Ex1 = Top.Node.Branch.at(0);
+		Ex2 = Top.Node.Branch.at(1);
+		if (Ex1.Node.type == Symbol)
+			Ex1 = ProType(Ex1);
+		if (Ex2.Node.type == Symbol)
+			Ex2 = ProType(Ex2);
+		if (Ex1.Node.type == Bool)
+		{
+			InterpreterSemanticError("Error: Cannot divide bools");
+			return Error;
+		}
+		else if (Ex1.Node.type == Value)
+		{
+			if (Ex2.Node.type == Bool)
+			{
+				InterpreterSemanticError("Error: Cannot divide bools");
+				return Error;
+			}
+			else if (Ex2.Node.type == Value)
+			{
+				done = Ex1.Node.double_value - Ex2.Node.double_value;
+				return done;
+			}
+		}
+	}
+	else
+	{
+		InterpreterSemanticError("Error: Too few/Too many arguments");
+		return Error;
+	}
 }
