@@ -29,7 +29,7 @@ Expression Environment::ProType(Expression  Top)
 	if (Top.Node.string_value == "begin")
 	{
 		for (size_t i = 0; i < Top.Node.Branch.size(); i++)
-			temp = Operations(Top.Node.Branch[i]);
+			temp = Operations(*Top.Node.Branch[i]);
 	}
 	else if (Top.Node.string_value == "define")
 		temp = EnvDef(Top);
@@ -81,8 +81,8 @@ Expression Environment::EnvDef(Expression Top)
 	Expression temp;
 	if (Top.Node.Branch.size() == 2)
 	{
-		target = Top.Node.Branch.at(0);
-		value = Top.Node.Branch.at(1);
+		target = *Top.Node.Branch.at(0);
+		value = *Top.Node.Branch.at(1);
 		if (target.Node.type == Symbol)
 		{
 			if (!checkProcedure(target))
@@ -127,9 +127,9 @@ Expression Environment::EnvIf(Expression Top)
 	Expression temp2;
 	if (Top.Node.Branch.size() == 3)
 	{
-		boolExpress = Top.Node.Branch.at(0);
-		ex1 = Top.Node.Branch.at(1);
-		ex2 = Top.Node.Branch.at(2);
+		boolExpress = *Top.Node.Branch.at(0);
+		ex1 = *Top.Node.Branch.at(1);
+		ex2 = *Top.Node.Branch.at(2);
 		if (!checkProcedure(boolExpress))
 		{
 			if (boolExpress.Node.type == Bool)
@@ -194,12 +194,13 @@ Expression Environment::EnvIf(Expression Top)
 			}
 		}
 	}
+	return Error;
 }
 
 Expression Environment::NonSpec(Expression Top)
 {
 	Expression temp;
-	if (!checkProcedure)
+	if (!checkProcedure(Top))
 	{
 		temp = Dictionary.at(Top.Node.string_value);
 		return temp;
@@ -219,7 +220,7 @@ Expression Environment::EnvNot(Expression Top)
 	Expression Done;
 	if (Top.Node.Branch.size() == 1)
 	{
-		Temp = Top.Node.Branch.at(0);
+		Temp = *Top.Node.Branch.at(0);
 		if (Temp.Node.type == Symbol)
 			Temp = ProType(Temp);
 
@@ -237,6 +238,7 @@ Expression Environment::EnvNot(Expression Top)
 			InterpreterSemanticError("Error: Values cannot be logically negated");
 			return Error;
 		}
+		return Done;
 	}
 	else
 	{
@@ -252,7 +254,7 @@ Expression Environment::EnvMinus(Expression Top)
 	Expression done;
 	if (Top.Node.Branch.size() == 1)
 	{
-		Ex1 = Top.Node.Branch.at(0);
+		Ex1 = *Top.Node.Branch.at(0);
 		if (Ex1.Node.type == Symbol)
 			Ex1 = ProType(Ex1);
 		if (Ex1.Node.type == Bool)
@@ -266,11 +268,12 @@ Expression Environment::EnvMinus(Expression Top)
 			done.Node.double_value = 1 - done.Node.double_value;
 			return done;
 		}
+		return Ex1;
 	}
 	else if (Top.Node.Branch.size() == 2)
 	{
-		Ex1 = Top.Node.Branch.at(0);
-		Ex2 = Top.Node.Branch.at(1);
+		Ex1 = *Top.Node.Branch.at(0);
+		Ex2 = *Top.Node.Branch.at(1);
 		if (Ex1.Node.type == Symbol)
 			Ex1 = ProType(Ex1);
 		if (Ex2.Node.type == Symbol)
@@ -294,7 +297,7 @@ Expression Environment::EnvMinus(Expression Top)
 			}
 		}
 	}
-
+	return done;
 }
 
 Expression Environment::EnvMult(Expression Top)
@@ -303,7 +306,7 @@ Expression Environment::EnvMult(Expression Top)
 	Expression Product(1.0);
 	for (size_t i = 0; i < Top.Node.Branch.size(); i++)
 	{
-		Ex1 = Top.Node.Branch.at(i);
+		Ex1 = *Top.Node.Branch.at(i);
 		if (Ex1.Node.type == Symbol)
 		{
 			Ex1 = ProType(Ex1);
@@ -331,10 +334,10 @@ Expression Environment::EnvAnd(Expression Top)
 		InterpreterSemanticError("Error: To few arguments. Must have a minimum of two");
 		return Error;
 	}
-	Ex1 = Top.Node.Branch.at(0);
+	Ex1 = *Top.Node.Branch.at(0);
 	for (size_t i = 1; i < Top.Node.Branch.size(); i++)
 	{
-		Ex2 = Top.Node.Branch.at(i);
+		Ex2 = *Top.Node.Branch.at(i);
 		if (Ex1.Node.type == Symbol)
 			Ex1 = ProType(Ex1);
 		if (Ex2.Node.type == Symbol)
@@ -355,6 +358,7 @@ Expression Environment::EnvAnd(Expression Top)
 				Final.Node.bool_value = Ex2.Node.bool_value && Ex2.Node.bool_value && Final.Node.bool_value;
 		}
 	}
+	return Error;
 }
 
 Expression Environment::EnvOr(Expression Top)
@@ -367,10 +371,10 @@ Expression Environment::EnvOr(Expression Top)
 		InterpreterSemanticError("Error: To few arguments. Must have a minimum of two");
 		return Error;
 	}
-	Ex1 = Top.Node.Branch.at(0);
+	Ex1 = *Top.Node.Branch.at(0);
 	for (size_t i = 1; i < Top.Node.Branch.size(); i++)
 	{
-		Ex2 = Top.Node.Branch.at(i);
+		Ex2 = *Top.Node.Branch.at(i);
 		if (Ex1.Node.type == Symbol)
 			Ex1 = ProType(Ex1);
 		if (Ex2.Node.type == Symbol)
@@ -391,6 +395,7 @@ Expression Environment::EnvOr(Expression Top)
 				Final.Node.bool_value = Ex2.Node.bool_value || Ex2.Node.bool_value || Final.Node.bool_value;
 		}
 	}
+	return Error;
 }
 
 Expression Environment::EnvAdd(Expression Top)
@@ -399,7 +404,7 @@ Expression Environment::EnvAdd(Expression Top)
 	Expression Sum(0);
 	for (size_t i = 0; i < Top.Node.Branch.size(); i++)
 	{
-		Ex1 = Top.Node.Branch.at(i);
+		Ex1 = *Top.Node.Branch.at(i);
 		if (Ex1.Node.type == Symbol)
 		{
 			Ex1 = ProType(Ex1);
@@ -434,8 +439,8 @@ Expression Environment::EnvLes(Expression Top)
 	}
 	else
 	{
-		Ex1 = Top.Node.Branch.at(0);
-		Ex2 = Top.Node.Branch.at(1);
+		Ex1 = *Top.Node.Branch.at(0);
+		Ex2 = *Top.Node.Branch.at(1);
 		if (Ex1.Node.type == Symbol)
 			Ex1 = ProType(Ex1);
 		if (Ex2.Node.type == Symbol)
@@ -468,6 +473,7 @@ Expression Environment::EnvLes(Expression Top)
 			}
 		}
 	}
+	return Error;
 }
 
 Expression Environment::EnvLeq(Expression Top)
@@ -487,8 +493,8 @@ Expression Environment::EnvLeq(Expression Top)
 	}
 	else
 	{
-		Ex1 = Top.Node.Branch.at(0);
-		Ex2 = Top.Node.Branch.at(1);
+		Ex1 = *Top.Node.Branch.at(0);
+		Ex2 = *Top.Node.Branch.at(1);
 		if (Ex1.Node.type == Symbol)
 			Ex1 = ProType(Ex1);
 		if (Ex2.Node.type == Symbol)
@@ -526,6 +532,7 @@ Expression Environment::EnvLeq(Expression Top)
 			}
 		}
 	}
+	return Error;
 }
 
 Expression Environment::EnvGrt(Expression Top)
@@ -545,8 +552,8 @@ Expression Environment::EnvGrt(Expression Top)
 	}
 	else
 	{
-		Ex1 = Top.Node.Branch.at(0);
-		Ex2 = Top.Node.Branch.at(1);
+		Ex1 = *Top.Node.Branch.at(0);
+		Ex2 = *Top.Node.Branch.at(1);
 		if (Ex1.Node.type == Symbol)
 			Ex1 = ProType(Ex1);
 		if (Ex2.Node.type == Symbol)
@@ -579,6 +586,7 @@ Expression Environment::EnvGrt(Expression Top)
 			}
 		}
 	}
+	return Error;
 }
 
 Expression Environment::EnvGeq(Expression Top)
@@ -598,8 +606,8 @@ Expression Environment::EnvGeq(Expression Top)
 	}
 	else
 	{
-		Ex1 = Top.Node.Branch.at(0);
-		Ex2 = Top.Node.Branch.at(1);
+		Ex1 = *Top.Node.Branch.at(0);
+		Ex2 = *Top.Node.Branch.at(1);
 		if (Ex1.Node.type == Symbol)
 			Ex1 = ProType(Ex1);
 		if (Ex2.Node.type == Symbol)
@@ -637,6 +645,7 @@ Expression Environment::EnvGeq(Expression Top)
 			}
 		}
 	}
+	return Error;
 }
 
 Expression Environment::EnvEq(Expression Top)
@@ -656,8 +665,8 @@ Expression Environment::EnvEq(Expression Top)
 	}
 	else
 	{
-		Ex1 = Top.Node.Branch.at(0);
-		Ex2 = Top.Node.Branch.at(1);
+		Ex1 = *Top.Node.Branch.at(0);
+		Ex2 = *Top.Node.Branch.at(1);
 		if (Ex1.Node.type == Symbol)
 			Ex1 = ProType(Ex1);
 		if (Ex2.Node.type == Symbol)
@@ -676,7 +685,7 @@ Expression Environment::EnvEq(Expression Top)
 			}
 			else if (Ex2.Node.type == Value)
 			{
-				else if (Ex1.Node.double_value == Ex2.Node.double_value)
+				if (Ex1.Node.double_value == Ex2.Node.double_value)
 				{
 					done.Node.bool_value = true;
 					done.Node.type = Bool;
@@ -690,6 +699,7 @@ Expression Environment::EnvEq(Expression Top)
 			}
 		}
 	}
+	return Error;
 }
 
 Expression Environment::EnvDiv(Expression Top)
@@ -699,8 +709,8 @@ Expression Environment::EnvDiv(Expression Top)
 	Expression done;
 	if (Top.Node.Branch.size() == 2)
 	{
-		Ex1 = Top.Node.Branch.at(0);
-		Ex2 = Top.Node.Branch.at(1);
+		Ex1 = *Top.Node.Branch.at(0);
+		Ex2 = *Top.Node.Branch.at(1);
 		if (Ex1.Node.type == Symbol)
 			Ex1 = ProType(Ex1);
 		if (Ex2.Node.type == Symbol)
@@ -729,4 +739,5 @@ Expression Environment::EnvDiv(Expression Top)
 		InterpreterSemanticError("Error: Too few/Too many arguments");
 		return Error;
 	}
+	return Error;
 }

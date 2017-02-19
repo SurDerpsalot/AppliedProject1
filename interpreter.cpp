@@ -1,6 +1,5 @@
 #include <iostream>
 #include "interpreter.hpp"
-//#include "expression.hpp"
 #include "tokenize.hpp"
 
 Interpreter::Interpreter()
@@ -161,7 +160,8 @@ void Interpreter::StoreSymbol(std::string input, Expression *node)
 	node->Node.string_value = input;
 }
 
-/*Expression eval() 
+Expression Interpreter::eval() 
 {
-
-}*/
+	Environment Enviro;
+	return Enviro.Operations(Root);
+}

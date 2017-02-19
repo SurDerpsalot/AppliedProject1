@@ -6,7 +6,7 @@
 #include "interpreter_semantic_error.hpp"
 class Environment {
 public:
-	typedef Expression(Environment::*FunctionPointer(Expression));
+	typedef Expression(Environment::*FunctionPointer)(Expression);
 	typedef std::map<std::string, FunctionPointer > MAP;
 	Environment();
 	void EnviroBuild();

@@ -33,7 +33,7 @@ public:
 	// Equality operator for two Expressions, two expressions are equal if the have the same 
 	// type, atom value, and number of arguments
 	bool operator==(const Expression & exp) const noexcept;
-
+	//bool operator&&(const Expression & exp) const noexcept;
 private:
 
 };

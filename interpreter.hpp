@@ -1,7 +1,7 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 #include "tokenize.hpp"
-#include "expression.hpp"
+#include "environment.hpp"
 
 
 class Interpreter {
@@ -17,7 +17,7 @@ public:
 	// Evaluate the current AST and return the resulting Expression
 	// throws InterpreterSemanticError if a semantic error is encountered
 	// the exception message string should document the nature of the semantic error 
-	//Expression eval();
+	Expression eval();
 
 	bool checkBasicInput(std::vector<std::string> & input);
 	bool checkNumInput(std::vector<std::string> & input);
