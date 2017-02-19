@@ -163,5 +163,13 @@ void Interpreter::StoreSymbol(std::string input, Expression *node)
 Expression Interpreter::eval() 
 {
 	Environment Enviro;
-	return Enviro.Operations(Root);
+	Expression result;
+	try {
+		result = Enviro.Operations(*Root);
+	}
+	catch (InterpreterSemanticError & ERR)
+	{
+		throw ERR;
+	}
+	return result;
 }
