@@ -115,12 +115,12 @@ bool Interpreter::BuildTree(std::vector<token> ParsedData, size_t & i, Expressio
 
 void Interpreter::Store(std::string input, Expression * node)
 {
-	if (input == "true")
+	if (input == "True")
 	{
 		node->Node.type = Bool;
 		node->Node.bool_value = true;
 	}
-	else if (input == "false")
+	else if (input == "False")
 	{
 		node->Node.type = Bool;
 		node->Node.bool_value = false;
