@@ -29,7 +29,14 @@ int main(int argc, char*argv[])
 			Interpreter Interp;
 			Expression output;
 			Interp.parse(in);
-			output = Interp.eval();
+			try { 
+				output = Interp.eval();
+			}
+			catch (InterpreterSemanticError & ERR)
+			{
+				throw ERR;
+				return EXIT_SUCCESS;
+			}
 			if (output.Node.type == Bool)
 				cout << "(" << output.Node.bool_value << ")" << std::endl;
 			else if (output.Node.type == Value)

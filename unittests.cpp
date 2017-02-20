@@ -4,7 +4,7 @@
 #include "interpreter.hpp"
 #include "expression.hpp"
 
-TEST_CASE("Test Interpreter parser with expected input", "[interpreter]") {
+TEST_CASE("Test Interpreter parser with an expected input", "[interpreter]") {
 
 	std::string program = "(begin (define r 11) (* pi (* r true)))";
 
@@ -17,7 +17,7 @@ TEST_CASE("Test Interpreter parser with expected input", "[interpreter]") {
 	REQUIRE(ok == true);
 }
 
-TEST_CASE("Test Expression overload", "[Expression]")
+TEST_CASE("Test the Expression overload", "[Expression]")
 {
 	std::string pass;
 	pass = "false";
@@ -33,11 +33,11 @@ TEST_CASE("Test Expression overload", "[Expression]")
 	REQUIRE((g == h) == false);
 }
 
-/*
-TEST_CASE("Test Interpreter parser with truncated input", "[interpreter]") {
+
+TEST_CASE("Test Interpreter parser with a truncated input", "[interpreter]") {
 
 	{
-		std::string program = "(f";
+		std::string program = "(false";
 		std::istringstream iss(program);
 
 		Interpreter interp;
@@ -46,7 +46,7 @@ TEST_CASE("Test Interpreter parser with truncated input", "[interpreter]") {
 	}
 
 	{
-		std::string program = "(begin (define r 10) (* pi (* r r";
+		std::string program = "(begin (define r 10) (* pi (* r r((";
 		std::istringstream iss(program);
 
 		Interpreter interp;
@@ -54,9 +54,10 @@ TEST_CASE("Test Interpreter parser with truncated input", "[interpreter]") {
 		REQUIRE(ok == false);
 	}
 }
-TEST_CASE("Test Interpreter parser with extra input", "[interpreter]") {
 
-	std::string program = "(begin (define r 10) (* pi (* r r))) )";
+TEST_CASE("Test Interpreter parser with extra inputs", "[interpreter]") {
+
+	std::string program = "(begin (define r 10) (* pi (* r r))))) )";
 	std::istringstream iss(program);
 
 	Interpreter interp;
@@ -66,9 +67,9 @@ TEST_CASE("Test Interpreter parser with extra input", "[interpreter]") {
 	REQUIRE(ok == false);
 }
 
-TEST_CASE("Test Interpreter parser with single non-keyword", "[interpreter]") {
+TEST_CASE("Test Interpreter parser with a non-keyword", "[interpreter]") {
 
-	std::string program = "hello";
+	std::string program = "yarrr";
 	std::istringstream iss(program);
 
 	Interpreter interp;
@@ -78,9 +79,9 @@ TEST_CASE("Test Interpreter parser with single non-keyword", "[interpreter]") {
 	REQUIRE(ok == false);
 }
 
-TEST_CASE("Test Interpreter parser with empty input", "[interpreter]") {
+TEST_CASE("Test Interpreter parser with empty expression (no space)", "[interpreter]") {
 
-	std::string program;
+	std::string program = "()";
 	std::istringstream iss(program);
 
 	Interpreter interp;
@@ -90,9 +91,9 @@ TEST_CASE("Test Interpreter parser with empty input", "[interpreter]") {
 	REQUIRE(ok == false);
 }
 
-TEST_CASE("Test Interpreter parser with empty expression", "[interpreter]") {
+TEST_CASE("Test Interpreter parsers with bad number string", "[interpreter]") {
 
-	std::string program = "( )";
+	std::string program = "(1afge)";
 	std::istringstream iss(program);
 
 	Interpreter interp;
@@ -101,15 +102,3 @@ TEST_CASE("Test Interpreter parser with empty expression", "[interpreter]") {
 
 	REQUIRE(ok == false);
 }
-
-TEST_CASE("Test Interpreter parser with bad number string", "[interpreter]") {
-
-	std::string program = "(1abc)";
-	std::istringstream iss(program);
-
-	Interpreter interp;
-
-	bool ok = interp.parse(iss);
-
-	REQUIRE(ok == false);
-}*/

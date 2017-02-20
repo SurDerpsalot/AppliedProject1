@@ -29,7 +29,7 @@ bool Interpreter::checkBasicInput(std::vector<token> & input)
 {
 	if (input.size() <=2)
 	{
-		std::cout << "Encountered Parse Error." << std::endl;
+		std::cout << "Error: Encountered Parse Error." << std::endl;
 		return false;
 	}
 	int ParaCount = 0;
@@ -40,7 +40,7 @@ bool Interpreter::checkBasicInput(std::vector<token> & input)
 			ParaCount++;
 			if (input.at(i + 1) == ")" || input.at(i + 1) == "(")
 			{
-				std::cout << "Encountered Parse Error." << std::endl;
+				std::cout << "Error: Encountered Parse Error." << std::endl;
 				return false;
 			}
 		}
@@ -53,7 +53,7 @@ bool Interpreter::checkBasicInput(std::vector<token> & input)
 	}
 	else
 	{
-		std::cout << "Encountered Parse Error." << std::endl;
+		std::cout << "Error: Encountered Parse Error." << std::endl;
 		return false;
 	}
 }
@@ -85,8 +85,21 @@ bool Interpreter::BuildTree(std::vector<token> ParsedData, size_t & i, Expressio
 	if (Root == NULL)
 	{
 		Root = new Expression;
-		Root->Node.type = Symbol;
-		Root->Node.string_value = ParsedData.at(i + 1);
+		if (ParsedData.at(i + 1) == "True")
+		{
+			Root->Node.type = Bool;
+			Root->Node.bool_value = true;
+		}
+		else if (ParsedData.at(i + 1) == "False")
+		{
+			Root->Node.type = Bool;
+			Root->Node.bool_value = false;
+		}
+		else
+		{
+			Root->Node.type = Symbol;
+			Root->Node.string_value = ParsedData.at(i + 1);
+		}
 		i = i + 2;
 		currentLevel = Root;
 	}
@@ -160,6 +173,19 @@ void Interpreter::StoreSymbol(std::string input, Expression *node)
 	node->Node.string_value = input;
 }
 
+void Interpreter::destroyTree(Expression* curLevel) {
+	if (curLevel == nullptr) {
+		return;
+	}
+	else {
+		for (size_t childIndex = 0; childIndex < curLevel->Node.Branch.size(); childIndex++) {
+			destroyTree(curLevel->Node.Branch[childIndex]);
+		}
+		delete curLevel;
+		curLevel = NULL;
+	}
+}
+
 Expression Interpreter::eval() 
 {
 	Environment Enviro;
@@ -171,5 +197,6 @@ Expression Interpreter::eval()
 	{
 		throw ERR;
 	}
+	destroyTree(Root);
 	return result;
 }

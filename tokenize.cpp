@@ -2,7 +2,7 @@
 
 token StringFormat(token Unformatted)
 {
-	for (int i = 0; i < Unformatted.size(); i++)
+	for (size_t i = 0; i < Unformatted.size(); i++)
 	{
 		if (Unformatted.at(i) == '(')
 		{
