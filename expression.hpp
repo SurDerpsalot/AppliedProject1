@@ -1,8 +1,7 @@
 #ifndef EXPRESSION_H
 #define EXPRESSION_H
-//#include "environment.hpp"
 #include <vector>
-#include "string.h"
+#include <string>
 
 enum AtomType { None, Bool, Symbol, Value };
 

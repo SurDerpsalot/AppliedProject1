@@ -1,8 +1,8 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
-#include "string.h"
 #include "expression.hpp"
 #include <map>
+#include <math.h>
 #include "interpreter_semantic_error.hpp"
 class Environment {
 public:

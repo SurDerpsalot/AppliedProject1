@@ -3,6 +3,7 @@
 #include "catch.hpp"
 #include "interpreter.hpp"
 #include "expression.hpp"
+#include "test_config.hpp"
 
 TEST_CASE("Test Interpreter parser with an expected input", "[interpreter]") {
 
