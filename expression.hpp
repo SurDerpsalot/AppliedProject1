@@ -2,7 +2,7 @@
 #define EXPRESSION_H
 #include <vector>
 #include <string>
-
+#include <iostream>
 enum AtomType { None, Bool, Symbol, Value };
 
 class Expression{

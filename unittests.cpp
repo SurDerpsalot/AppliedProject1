@@ -103,3 +103,4 @@ TEST_CASE("Test Interpreter parsers with bad number string", "[interpreter]") {
 
 	REQUIRE(ok == false);
 }
+

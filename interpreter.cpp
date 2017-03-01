@@ -29,7 +29,7 @@ bool Interpreter::checkBasicInput(std::vector<token> & input)
 {
 	if (input.size() <=2)
 	{
-		std::cout << "Error: Encountered Parse Error." << std::endl;
+		//std::cout << "Error: Encountered a Parse Error" << std::endl;
 		return false;
 	}
 	int ParaCount = 0;
@@ -40,7 +40,7 @@ bool Interpreter::checkBasicInput(std::vector<token> & input)
 			ParaCount++;
 			if (input.at(i + 1) == ")" || input.at(i + 1) == "(")
 			{
-				std::cout << "Error: Encountered Parse Error." << std::endl;
+				//std::cout << "Error: Error with Paranthesis placement in statement" << std::endl;
 				return false;
 			}
 		}
@@ -53,7 +53,7 @@ bool Interpreter::checkBasicInput(std::vector<token> & input)
 	}
 	else
 	{
-		std::cout << "Error: Encountered Parse Error." << std::endl;
+		//std::cout << "Error: Too many Paranthesis" << std::endl;
 		return false;
 	}
 }
@@ -97,8 +97,9 @@ bool Interpreter::BuildTree(std::vector<token> ParsedData, size_t & i, Expressio
 		}
 		else
 		{
-			Root->Node.type = Symbol;
-			Root->Node.string_value = ParsedData.at(i + 1);
+			StoreNum(ParsedData.at(i + 1), Root);
+			//Root->Node.type = Symbol;
+			//Root->Node.string_value = ParsedData.at(i + 1);
 		}
 		i = i + 2;
 		currentLevel = Root;

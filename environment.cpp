@@ -5,9 +5,10 @@ Environment::Environment()
 	std::map<std::string, Expression> Dictionary;
 	double store;
 	store = atan2(0, -1);
+	Expression pie(store);
 	std::string pi;
 	pi = "pi";
-	Dictionary.emplace(pi, store);
+	Dictionary.emplace(pi, pie);
 	EnviroBuild();
 }
 
@@ -242,20 +243,37 @@ Expression Environment::NonSpec(Expression Top)
 	Expression temp;
 	if (!checkProcedure(Top))
 	{
-		temp = Dictionary.at(Top.Node.string_value);
+		std::map<std::string, Expression>::iterator found;
+		found = Dictionary.find(Top.Node.string_value);
+		if(found != Dictionary.end())
+			temp = Dictionary.at(Top.Node.string_value);
+		else
+		{
+			throw InterpreterSemanticError("Error: Symbol not defined");
+			return Error;
+		}
 		return temp;
 	}
 	else 
 	{
-		pro = Express.find(Top.Node.string_value);
-		auto mem = pro->second;
-		try {
-			temp = (this->*mem)(Top);
+		if (Top.Node.string_value == "pi")
+		{
+			Expression pie(atan2(0, -1));
+			temp = pie;
 			return temp;
 		}
-		catch (InterpreterSemanticError & ERR)
+		else
 		{
-			throw ERR;
+			pro = Express.find(Top.Node.string_value);
+			auto mem = pro->second;
+			try {
+				temp = (this->*mem)(Top);
+				return temp;
+			}
+			catch (InterpreterSemanticError & ERR)
+			{
+				throw ERR;
+			}
 		}
 	}
 }
@@ -343,6 +361,11 @@ Expression Environment::EnvMinus(Expression Top)
 			}
 		}
 	}
+	else
+	{
+		throw InterpreterSemanticError("Error: Too many arguments");
+		return Error;
+	}
 	return done;
 }
 
@@ -404,7 +427,7 @@ Expression Environment::EnvAnd(Expression Top)
 				Final.Node.bool_value = Ex2.Node.bool_value && Ex2.Node.bool_value && Final.Node.bool_value;
 		}
 	}
-	return Error;
+	return Final;
 }
 
 Expression Environment::EnvOr(Expression Top)
@@ -441,7 +464,7 @@ Expression Environment::EnvOr(Expression Top)
 				Final.Node.bool_value = Ex2.Node.bool_value || Ex2.Node.bool_value || Final.Node.bool_value;
 		}
 	}
-	return Error;
+	return Final;
 }
 
 Expression Environment::EnvAdd(Expression Top)
