@@ -24,6 +24,10 @@ token StringFormat(token Unformatted)
 				Unformatted.erase(i);
 			}
 		}
+		else if (Unformatted.at(i) == '\n')
+		{
+			Unformatted.erase(i);
+		}
 	}
 	return Unformatted;
 }

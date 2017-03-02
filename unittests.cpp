@@ -18,6 +18,21 @@ TEST_CASE("Test Interpreter parser with an expected input", "[interpreter]") {
 	REQUIRE(ok == true);
 }
 
+TEST_CASE("Test Interpreter an example", "[interpreter]") {
+
+	std::string program = "(define x (/  (* (+ 1 2) 3) 4))";
+
+	std::istringstream iss(program);
+
+	Interpreter interp;
+
+	bool ok = interp.parse(iss);
+
+	REQUIRE(ok == true);
+}
+
+
+
 TEST_CASE("Test the Expression overload", "[Expression]")
 {
 	std::string pass;
@@ -103,4 +118,3 @@ TEST_CASE("Test Interpreter parsers with bad number string", "[interpreter]") {
 
 	REQUIRE(ok == false);
 }
-

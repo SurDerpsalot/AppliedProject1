@@ -9,20 +9,26 @@ Interpreter::Interpreter()
 
 bool Interpreter::parse(std::istream & input) noexcept
 {
-	token UnformattedLine;
-	token FormattedLine;
+	token UnformattedLine = "";
+	token FormattedLine = "";
+	token read;
+	bool out;
 	std::vector<token> ParsedData;
-	getline(input, UnformattedLine);
-	FormattedLine = StringFormat(UnformattedLine);
-	ParsedData = StringSplit(FormattedLine);
+	while (getline(input, UnformattedLine))
+	{
+		read = StringFormat(UnformattedLine);
+		FormattedLine = FormattedLine + read;
+	}
+		ParsedData = StringSplit(FormattedLine);
 	if (!checkBasicInput(ParsedData))
-		return false;
+		out = false;
 	else
 	{
 		size_t i = 0;
 		BuildTree(ParsedData, i, Root);
-		return true;
+		out = true;
 	}
+	return out;
 }
 
 bool Interpreter::checkBasicInput(std::vector<token> & input) 
@@ -60,8 +66,10 @@ bool Interpreter::checkBasicInput(std::vector<token> & input)
 
 bool Interpreter::checkNumInput(std::vector<std::string> & input) {
 	token number;
+	bool sci;
 	bool num;
 	num = false;
+	sci = false;
 	for (size_t i = 0; i < input.size(); i++)
 	{
 		number = input.at(i);
@@ -69,7 +77,7 @@ bool Interpreter::checkNumInput(std::vector<std::string> & input) {
 		{
 			if (num)
 			{
-				if (!isdigit(number[j]) && number[j] != '.')
+				if (!isdigit(number[j]) && number[j] != '.' && number[j] != 'e')
 					return false;
 			}
 			if (isdigit(number[j]))
@@ -162,10 +170,12 @@ void Interpreter::StoreNum(std::string input, Expression * node)
 	if (num)
 	{
 		node->Node.type = Value;
-		node->Node.double_value = std::stoi(input);
+		node->Node.double_value = std::stod(input);
 	}
 	else
+	{
 		StoreSymbol(input, node);
+	}	
 }
 
 void Interpreter::StoreSymbol(std::string input, Expression *node)
@@ -175,16 +185,14 @@ void Interpreter::StoreSymbol(std::string input, Expression *node)
 }
 
 void Interpreter::destroyTree(Expression* curLevel) {
-	if (curLevel == nullptr) {
-		return;
-	}
-	else {
-		for (size_t childIndex = 0; childIndex < curLevel->Node.Branch.size(); childIndex++) {
+	if (curLevel != nullptr) {
+		for (size_t childIndex = 0; childIndex < curLevel->Node.Branch.size(); childIndex++) 
+		{
 			destroyTree(curLevel->Node.Branch[childIndex]);
 		}
 		delete curLevel;
-		curLevel = NULL;
 	}
+	return;
 }
 
 Expression Interpreter::eval() 

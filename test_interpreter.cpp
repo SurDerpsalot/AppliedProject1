@@ -141,6 +141,21 @@ TEST_CASE( "Test Interpreter parser with bad number string", "[interpreter]" ) {
   REQUIRE(ok == false);
 }
 
+TEST_CASE("Test Interpreter result with example", "[interpreter]")
+{
+	std::string program = "(define x (/  (* (+ 1 2) 3) 4))";
+	Expression result = run(program);
+	REQUIRE(result == Expression(9.0));
+}
+
+TEST_CASE("Test Interpreter with multiple line input", "[interpreter]")
+{
+	std::string program = "(begin \n (define a 1) \n (define b pi) \n (if ( < a b) b a) \n )";
+	Expression result = run(program);
+	REQUIRE(result == Expression(atan2(0, -1)));
+}
+
+
 TEST_CASE( "Test Interpreter result with literal expressions", "[interpreter]" ) {
 
   { // Boolean True
@@ -148,25 +163,25 @@ TEST_CASE( "Test Interpreter result with literal expressions", "[interpreter]" )
     Expression result = run(program);
     REQUIRE(result == Expression(true));
   }
-
+  
   { // Boolean False
     std::string program = "(False)";
     Expression result = run(program);
     REQUIRE(result == Expression(false));
   }
-  
+ 
   { // Number
     std::string program = "(4)";
     Expression result = run(program);
     REQUIRE(result == Expression(4.));
   }
-
+ 
   { // Symbol
     std::string program = "(pi)";
     Expression result = run(program);
     REQUIRE(result == Expression(atan2(0, -1)));
   }
-
+ 
 }
 
 TEST_CASE( "Test Interpreter result with simple procedures (add)", "[interpreter]" ) {
@@ -218,7 +233,7 @@ TEST_CASE( "Test Interpreter special forms: begin and define", "[interpreter]" )
     Expression result = run(program);
     REQUIRE(result == Expression(42.));
   }
-  
+ 
   {
     std::string program = "(begin (define answer (+ 9 11)) (answer))";
     Expression result = run(program);
@@ -295,7 +310,7 @@ TEST_CASE( "Test logical procedures", "[interpreter]" ) {
 
   REQUIRE(run("(not True)") == Expression(false));
   REQUIRE(run("(not False)") == Expression(true));
-
+  
   REQUIRE(run("(and True True)") == Expression(true));
   REQUIRE(run("(and True False)") == Expression(false));
   REQUIRE(run("(and False True)") == Expression(false));

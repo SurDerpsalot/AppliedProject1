@@ -39,10 +39,7 @@ Expression::Expression(const std::string & value) {
 
 bool Expression::operator==(const Expression & exp) const noexcept 
 {
-	if ((Node.type == exp.Node.type) && (Node.Branch.size() == exp.Node.Branch.size()))
-		return true;
-	else
-		return false;
+	return (Node.type == exp.Node.type) && (Node.Branch.size() == exp.Node.Branch.size());
 }
 /*
 bool Expression::operator&&(const Expression & exp) const noexcept

@@ -6,15 +6,16 @@ using std::cout;
 
 int main(int argc, char*argv[])
 {
+	int output;
 	if (argc < 2) 
 	{
 		cout << "No input file selected" << std::endl;
-		return EXIT_FAILURE;
+		output = EXIT_FAILURE;
 	}
 	else if (argc > 2)
 	{
 		cout << "Too many arguments. Please pass in a single file to read from." << std::endl;
-		return EXIT_FAILURE;
+		output = EXIT_FAILURE;
 	}
 	else
 	{
@@ -22,7 +23,7 @@ int main(int argc, char*argv[])
 		if (!in.is_open()) 
 		{
 			cout << "The input file cout not be opened" << std::endl;
-			return EXIT_FAILURE;
+			output = EXIT_FAILURE;
 		}
 		else
 		{
@@ -35,14 +36,15 @@ int main(int argc, char*argv[])
 			catch (InterpreterSemanticError & ERR)
 			{
 				throw ERR;
-				return EXIT_SUCCESS;
+				output = EXIT_SUCCESS;
 			}
 			if (output.Node.type == Bool)
 				cout << "(" << output.Node.bool_value << ")" << std::endl;
 			else if (output.Node.type == Value)
 				cout << "(" << output.Node.double_value << ")" << std::endl;
 			in.close();
-			return EXIT_SUCCESS;
+			output = EXIT_SUCCESS;
 		}
 	}
+	return output;
 }

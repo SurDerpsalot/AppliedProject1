@@ -26,9 +26,9 @@ Expression Environment::Operations(Expression  Top)
 		}
 	}
 	else if (Top.Node.type == Bool)
-		return Top;
+		temp = Top;
 	else if (Top.Node.type == Value)
-		return Top;
+		temp = Top;
 	return temp;
 }
 
@@ -39,7 +39,8 @@ Expression Environment::ProType(Expression  Top)
 	{
 		for (size_t i = 0; i < Top.Node.Branch.size(); i++)
 		{
-			try {
+			try 
+			{
 				temp = Operations(*Top.Node.Branch[i]);
 			}
 			catch (InterpreterSemanticError & ERR)
@@ -99,20 +100,22 @@ void Environment::EnviroBuild()
 
 bool Environment::checkProcedure(Expression Target)
 {
+	bool output;
 	if ((Target.Node.string_value == "begin") || (Target.Node.string_value == "define") || (Target.Node.string_value == "if"))
-		return true;
+		output = true;
 	else if ((Target.Node.string_value == "not") || (Target.Node.string_value == "and") || (Target.Node.string_value == "or"))
-		return true;
+		output = true;
 	else if ((Target.Node.string_value == "<") || (Target.Node.string_value == "<=") || (Target.Node.string_value == ">"))
-		return true;
+		output = true;
 	else if ((Target.Node.string_value == ">=") || (Target.Node.string_value == "=") || (Target.Node.string_value == "+"))
-		return true;
+		output = true;
 	else if ((Target.Node.string_value == "-") || (Target.Node.string_value == "*") || (Target.Node.string_value == "/"))
-		return true;
+		output = true;
 	else if ((Target.Node.string_value == "pi"))
-		return true;
+		output = true;
 	else
-		return false;
+		output = false;
+	return output;
 }
 
 Expression Environment::EnvDef(Expression Top)
@@ -131,32 +134,32 @@ Expression Environment::EnvDef(Expression Top)
 				if (!checkProcedure(value))
 				{
 					Dictionary.emplace(target.Node.string_value, value);
-					return value;
+					temp = value;
 				}
 				else
 				{
 					temp = ProType(value);
 					Dictionary.emplace(target.Node.string_value, temp);
-					return temp;
 				}
 			}
 			else
 			{
 				throw InterpreterSemanticError("Error: Attempting to assign value to a procedure");
-				return Error;
+				temp = Error;
 			}
 		}
 		else
 		{
 			throw InterpreterSemanticError("Error: 'Define' cannot store into a non-symbol");
-			return Error;
+			temp = Error;
 		}
 	}
 	else
 	{
 		throw InterpreterSemanticError("Error: Not enough arguments in 'Define'");
-		return Error;
+		temp = Error;
 	}
+	return temp;
 }
 
 Expression Environment::EnvIf(Expression Top)
@@ -166,6 +169,7 @@ Expression Environment::EnvIf(Expression Top)
 	Expression ex2;
 	Expression temp;
 	Expression temp2;
+	std::map<std::string, Expression>::iterator found;
 	if (Top.Node.Branch.size() == 3)
 	{
 		boolExpress = *Top.Node.Branch.at(0);
@@ -178,28 +182,54 @@ Expression Environment::EnvIf(Expression Top)
 				if (boolExpress.Node.bool_value)
 				{
 					if (!checkProcedure(ex1))
-						return ex1;
+					{
+						if (ex1.Node.type == Symbol)
+						{
+							found = Dictionary.find(ex1.Node.string_value);
+							if (found != Dictionary.end())
+								temp2 = Dictionary.at(ex1.Node.string_value);
+							else
+							{
+								throw InterpreterSemanticError("Error: Symbol does not exist");
+								temp2 = Error;
+							}
+						}
+						else
+							temp2 = ex1;
+					}
 					else
 					{
-						temp = ProType(ex1);
-						return temp;
+						temp2 = ProType(ex1);
 					}
 				}
 				else
 				{
 					if (!checkProcedure(ex2))
-						return ex2;
+					{
+						if (ex2.Node.type == Symbol)
+						{
+							found = Dictionary.find(ex2.Node.string_value);
+							if (found != Dictionary.end())
+								temp2 = Dictionary.at(ex2.Node.string_value);
+							else
+							{
+								throw InterpreterSemanticError("Error: Symbol does not exist");
+								temp2 = Error;
+							}
+						}
+						else
+							temp2 = ex2;
+					}
 					else
 					{
-						temp = ProType(ex2);
-						return temp;
+						temp2 = ProType(ex2);
 					}
 				}
 			}
 			else
 			{
 				throw InterpreterSemanticError("Error: expression1 does not result in a Boolean Atom");
-				return Error;
+				temp2 = Error;
 			}
 		}
 		else
@@ -210,32 +240,58 @@ Expression Environment::EnvIf(Expression Top)
 				if (temp.Node.bool_value)
 				{
 					if (!checkProcedure(ex1))
-						return ex1;
+					{
+						if (ex1.Node.type == Symbol)
+						{
+							found = Dictionary.find(ex1.Node.string_value);
+							if (found != Dictionary.end())
+								temp2 = Dictionary.at(ex1.Node.string_value);
+							else
+							{
+								throw InterpreterSemanticError("Error: Symbol does not exist");
+								temp2 = Error;
+							}
+						}
+						else
+							temp2 = ex1;
+					}
 					else
 					{
 						temp2 = ProType(ex1);
-						return temp2;
 					}
 				}
 				else
 				{
 					if (!checkProcedure(ex2))
-						return ex2;
+					{
+						if (ex2.Node.type == Symbol)
+						{
+							found = Dictionary.find(ex2.Node.string_value);
+							if (found != Dictionary.end())
+								temp2 = Dictionary.at(ex2.Node.string_value);
+							else
+							{
+								throw InterpreterSemanticError("Error: Symbol does not exist");
+								temp2 = Error;
+							}
+						}
+						else
+							temp2 = ex2;
+					}
 					else
 					{
 						temp2 = ProType(ex2);
-						return temp2;
 					}
 				}
 			}
 			else
 			{
 				throw InterpreterSemanticError("Error: expression1 does not resulf in a Boolean Atom");
-				return Error;
+				temp2 = Error;
 			}
 		}
 	}
-	return Error;
+	return temp2;
 }
 
 Expression Environment::NonSpec(Expression Top)
@@ -250,9 +306,8 @@ Expression Environment::NonSpec(Expression Top)
 		else
 		{
 			throw InterpreterSemanticError("Error: Symbol not defined");
-			return Error;
+			temp = Error;
 		}
-		return temp;
 	}
 	else 
 	{
@@ -260,7 +315,6 @@ Expression Environment::NonSpec(Expression Top)
 		{
 			Expression pie(atan2(0, -1));
 			temp = pie;
-			return temp;
 		}
 		else
 		{
@@ -268,7 +322,6 @@ Expression Environment::NonSpec(Expression Top)
 			auto mem = pro->second;
 			try {
 				temp = (this->*mem)(Top);
-				return temp;
 			}
 			catch (InterpreterSemanticError & ERR)
 			{
@@ -276,6 +329,7 @@ Expression Environment::NonSpec(Expression Top)
 			}
 		}
 	}
+	return temp;
 }
 
 Expression Environment::EnvNot(Expression Top) 
@@ -295,20 +349,19 @@ Expression Environment::EnvNot(Expression Top)
 				Done.Node.bool_value = false;
 			else
 				Done.Node.bool_value = true;
-			return Done;
 		}
 		else if (Temp.Node.type == Value)
 		{
 			throw InterpreterSemanticError("Error: Values cannot be logically negated");
-			return Error;
+			Done = Error;
 		}
-		return Done;
 	}
 	else
 	{
 		throw InterpreterSemanticError("Error: Too many/too few arguments for 'not' procedure");
-		return Error;
+		Done = Error;
 	}
+	return Done;
 }
 
 Expression Environment::EnvMinus(Expression Top)
@@ -324,15 +377,13 @@ Expression Environment::EnvMinus(Expression Top)
 		if (Ex1.Node.type == Bool)
 		{
 			throw InterpreterSemanticError("Error: Cannot make a bool negative in this procedure");
-			return Error;
+			done = Error;
 		}
 		else if (Ex1.Node.type == Value)
 		{
 			done = Ex1;
-			done.Node.double_value = 1 - done.Node.double_value;
-			return done;
+			done.Node.double_value = 0 - done.Node.double_value;
 		}
-		return Ex1;
 	}
 	else if (Top.Node.Branch.size() == 2)
 	{
@@ -345,26 +396,25 @@ Expression Environment::EnvMinus(Expression Top)
 		if (Ex1.Node.type == Bool)
 		{
 			throw InterpreterSemanticError("Error: Cannot subtract bools");
-			return Error;
+			done = Error;
 		}
 		else if (Ex1.Node.type == Value)
 		{
 			if (Ex2.Node.type == Bool)
 			{
 				throw InterpreterSemanticError("Error: Cannot subtract bools");
-				return Error;
+				done =  Error;
 			}
 			else if (Ex2.Node.type == Value)
 			{
 				done = Ex1.Node.double_value - Ex2.Node.double_value;
-				return done;
 			}
 		}
 	}
 	else
 	{
 		throw InterpreterSemanticError("Error: Too many arguments");
-		return Error;
+		done = Error;
 	}
 	return done;
 }
@@ -383,7 +433,7 @@ Expression Environment::EnvMult(Expression Top)
 		if (Ex1.Node.type == Bool)
 		{
 			throw InterpreterSemanticError("Error: cannot multiply a Bool");
-			return Error;
+			Product = Error;
 		}
 		else if (Ex1.Node.type == Value)
 		{
@@ -401,7 +451,7 @@ Expression Environment::EnvAnd(Expression Top)
 	if (Top.Node.Branch.size() < 2)
 	{
 		throw InterpreterSemanticError("Error: To few arguments. Must have a minimum of two");
-		return Error;
+		Final = Error;
 	}
 	Ex1 = *Top.Node.Branch.at(0);
 	for (size_t i = 1; i < Top.Node.Branch.size(); i++)
@@ -414,14 +464,14 @@ Expression Environment::EnvAnd(Expression Top)
 		if (Ex1.Node.type == Value)
 		{
 			throw InterpreterSemanticError("Error: Doesn't accept number arguments");
-			return Error;
+			Final = Error;
 		}
 		else if (Ex1.Node.type == Bool)
 		{
 			if (Ex2.Node.type == Value)
 			{
 				throw InterpreterSemanticError("Error: Doesn't accept number arguments");
-				return Error;
+				Final = Error;
 			}
 			else if (Ex2.Node.type == Bool)
 				Final.Node.bool_value = Ex2.Node.bool_value && Ex2.Node.bool_value && Final.Node.bool_value;
