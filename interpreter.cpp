@@ -5,6 +5,7 @@
 Interpreter::Interpreter()
 {
 	Root = NULL;
+	Environment Enviro;
 }
 
 bool Interpreter::parse(std::istream & input) noexcept
@@ -197,7 +198,6 @@ void Interpreter::destroyTree(Expression* curLevel) {
 
 Expression Interpreter::eval() 
 {
-	Environment Enviro;
 	Expression result;
 	try {
 		result = Enviro.Operations(*Root);

@@ -31,6 +31,7 @@ public:
 private:
 	Expression * Root;
 	Expression * CurLvl;
+	Environment Enviro;
 };
 
 #endif

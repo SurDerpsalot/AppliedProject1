@@ -118,3 +118,46 @@ TEST_CASE("Test Interpreter parsers with bad number string", "[interpreter]") {
 
 	REQUIRE(ok == false);
 }
+
+TEST_CASE("Test Expression Builds", "[expression]")
+{
+	std::string input = "asdf";
+	Expression empty;
+	Expression boolean(true);
+	Expression string(input);
+	Expression value(3.2);
+
+	REQUIRE((empty.Node.type == None) == true);
+	REQUIRE((boolean.Node.type == Bool)==true);
+	REQUIRE((boolean.Node.bool_value == true) == true);
+	REQUIRE((string.Node.type == Symbol) == true);
+	REQUIRE((string.Node.string_value == "asdf") == true);
+	REQUIRE((value.Node.type == Value) == true);
+	REQUIRE((value.Node.double_value == 3.2) == true);
+}
+
+TEST_CASE("Test Expression overloaded ==", "[expression]")
+{
+	std::string input = "true";
+	Expression Compare1(true);
+	Expression Compare2(false);
+	Expression Compare3(12);
+	Expression Compare4(input);
+
+	REQUIRE((Compare1 == Compare1)==true);
+	REQUIRE((Compare1 == Compare2) == true);
+	REQUIRE((Compare1 == Compare3) == false);
+	REQUIRE((Compare1 == Compare4) == false);
+	REQUIRE((Compare2 == Compare2) == true);
+	REQUIRE((Compare2 == Compare3) == false);
+	REQUIRE((Compare2 == Compare4) == false);
+	REQUIRE((Compare3 == Compare3) == true);
+	REQUIRE((Compare3 == Compare4) == false);
+	REQUIRE((Compare4 == Compare4) == true);
+	
+}
+
+TEST_CASE("Test formatting of strings", "[tokenize]")
+{
+
+}
