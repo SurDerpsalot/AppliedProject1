@@ -121,6 +121,7 @@ bool Interpreter::BuildTree(std::vector<token> ParsedData, size_t & i, Expressio
 			Store(ParsedData.at(i + 1), NewNode);
 			i = i + 2;
 			currentLevel->Node.Branch.push_back(NewNode);
+			
 			BuildTree(ParsedData, i, NewNode);
 		}
 		else if (ParsedData.at(i) == ")")
@@ -190,14 +191,19 @@ void Interpreter::destroyTree(Expression* curLevel) {
 		{
 			destroyTree(curLevel->Node.Branch[childIndex]);
 		}
-		delete curLevel;
+		curLevel = NULL;
 	}
 	return;
 }
 
+void Interpreter::resetEnviro()
+{
+	Environment newEnviro;
+	Enviro = newEnviro;
+}
+
 Expression Interpreter::eval() 
 {
-	Environment Enviro;
 	Expression result;
 	try {
 		result = Enviro.Operations(*Root);

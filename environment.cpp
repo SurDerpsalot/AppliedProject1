@@ -52,7 +52,7 @@ Expression Environment::ProType(Expression  Top)
 	else if (Top.Node.string_value == "define")
 	{
 		try {
-		temp = EnvDef(Top);
+			temp = EnvDef(Top);
 		}
 		catch (InterpreterSemanticError & ERR)
 		{
@@ -133,8 +133,23 @@ Expression Environment::EnvDef(Expression Top)
 			{
 				if (!checkProcedure(value))
 				{
-					Dictionary.emplace(target.Node.string_value, value);
 					temp = value;
+					if (value.Node.type == Symbol)
+					{
+						found = Dictionary.find(value.Node.string_value);
+						if (found != Dictionary.end())
+							temp = Dictionary[value.Node.string_value];
+						else
+						{
+							throw InterpreterSemanticError("Error: Symbol not found in dictionary");
+							temp = Error;
+						}
+					}
+					found = Dictionary.find(target.Node.string_value);
+					if (found != Dictionary.end())
+						Dictionary[target.Node.string_value] = temp;
+					else
+						Dictionary.emplace(target.Node.string_value, temp);
 				}
 				else
 				{
@@ -520,25 +535,36 @@ Expression Environment::EnvOr(Expression Top)
 Expression Environment::EnvAdd(Expression Top)
 {
 	Expression Ex1;
-	Expression Sum(0);
-	for (size_t i = 0; i < Top.Node.Branch.size(); i++)
+	Expression Ex2;
+	Ex1 = *Top.Node.Branch.at(0);
+	if (Ex1.Node.type == Bool)
 	{
-		Ex1 = *Top.Node.Branch.at(i);
+		throw InterpreterSemanticError("Error: cannot add a Bool");
+		return Error;
+	}
+	else
+	{
 		if (Ex1.Node.type == Symbol)
-		{
 			Ex1 = ProType(Ex1);
-		}
-		if (Ex1.Node.type == Bool)
+		for (size_t i = 1; i < Top.Node.Branch.size(); i++)
 		{
-			throw InterpreterSemanticError("Error: cannot add a Bool");
-			return Error;
-		}
-		else if (Ex1.Node.type == Value)
-		{
-			Sum.Node.double_value = Sum.Node.double_value + Ex1.Node.double_value;
+			Ex2 = *Top.Node.Branch.at(i);
+			if (Ex2.Node.type == Symbol)
+			{
+				Ex2 = ProType(Ex1);
+			}
+			if (Ex2.Node.type == Bool)
+			{
+				throw InterpreterSemanticError("Error: cannot add a Bool");
+				return Error;
+			}
+			else if (Ex2.Node.type == Value)
+			{
+				Ex1.Node.double_value = Ex2.Node.double_value + Ex1.Node.double_value;
+			}
 		}
 	}
-	return Sum;
+	return Ex1;
 }
 
 Expression Environment::EnvLes(Expression Top)
@@ -848,7 +874,7 @@ Expression Environment::EnvDiv(Expression Top)
 			}
 			else if (Ex2.Node.type == Value)
 			{
-				done = Ex1.Node.double_value - Ex2.Node.double_value;
+				done = Ex1.Node.double_value / Ex2.Node.double_value;
 				return done;
 			}
 		}

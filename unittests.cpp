@@ -31,8 +31,6 @@ TEST_CASE("Test Interpreter an example", "[interpreter]") {
 	REQUIRE(ok == true);
 }
 
-
-
 TEST_CASE("Test the Expression overload", "[Expression]")
 {
 	std::string pass;
@@ -48,7 +46,6 @@ TEST_CASE("Test the Expression overload", "[Expression]")
 	REQUIRE((e == h) == false);
 	REQUIRE((g == h) == false);
 }
-
 
 TEST_CASE("Test Interpreter parser with a truncated input", "[interpreter]") {
 
@@ -190,7 +187,6 @@ TEST_CASE("Test begin", "[environment]")
 	REQUIRE(output.Node.double_value == 13);
 }
 
-
 TEST_CASE("Test +", "[environment]")
 {
 	Interpreter Interp;
@@ -202,7 +198,7 @@ TEST_CASE("Test +", "[environment]")
 	REQUIRE(output.Node.double_value == 15);
 }
 
-TEST_CASE("Test negate", "[environment]")
+TEST_CASE("Test negate number", "[environment]")
 {
 	Interpreter Interp;
 	Expression output;
@@ -212,7 +208,6 @@ TEST_CASE("Test negate", "[environment]")
 	output = Interp.eval();
 	REQUIRE(output.Node.double_value == -1);
 }
-
 
 TEST_CASE("Test negate 2", "[environment]")
 {
@@ -225,6 +220,16 @@ TEST_CASE("Test negate 2", "[environment]")
 	REQUIRE(output.Node.double_value == -2);
 }
 
+TEST_CASE("Test negate negative number", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(- -2)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == 2);
+}
 
 TEST_CASE("Test subtraction", "[environment]")
 {
@@ -237,12 +242,319 @@ TEST_CASE("Test subtraction", "[environment]")
 	REQUIRE(output.Node.double_value == 1);
 }
 
-
 TEST_CASE("Test and", "[environment]")
 {
 	Interpreter Interp;
 	Expression output;
 	std::string in = "(begin (define a True) (define b True) (and a b))";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test and2", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(and True True)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test and3", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(and True False)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == false);
+}
+
+TEST_CASE("Test or", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(or True False)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test or2", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(or True True)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test or3", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(or True False False)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test mult", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(* 1 3)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == 3);
+}
+
+TEST_CASE("Test mult2", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(* -2 -2)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == 4);
+}
+
+TEST_CASE("Test mult3", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(* -13 14)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == -182);
+}
+
+TEST_CASE("Test div", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(/ 3 1)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == 3);
+}
+
+TEST_CASE("Test div2", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(/ -2 -2)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == 1);
+}
+
+TEST_CASE("Test div3", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(/ -28 4)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == -7);
+}
+
+TEST_CASE("Test equal", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(= 1 3)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == false);
+}
+
+TEST_CASE("Test equal2", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(= -133 133)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == false);
+}
+
+TEST_CASE("Test equal3", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(= 298 298)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test Greater than or Equal", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(>= 1 3)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == false);
+}
+
+TEST_CASE("Test Greater than or Equal2", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(>= -13 398)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == false);
+}
+
+TEST_CASE("Test Greater than or Equal3", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(>= 439 15)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test Greater than", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(> 1243 345)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test Greater than2", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(> -1238 2)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == false);
+}
+
+TEST_CASE("Test Greater than3", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(> 1 3)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == false);
+}
+
+TEST_CASE("Test Less than or Equal", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(<= 3 1)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == false);
+}
+
+TEST_CASE("Test Less than or Equal2", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(<= -13 398)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test Less than or Equal3", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(<= -439 -15)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test Less than", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(< 1243 345)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == false);
+}
+
+TEST_CASE("Test Less than2", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(< -1238 2)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test Less than3", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(< 0 3)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
+}
+
+TEST_CASE("Test Inverter", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(not True)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == false);
+}
+
+TEST_CASE("Test Inverter2", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(not (and True False))";
 	std::istringstream input(in);
 	Interp.parse(input);
 	output = Interp.eval();
