@@ -157,7 +157,94 @@ TEST_CASE("Test Expression overloaded ==", "[expression]")
 	
 }
 
-TEST_CASE("Test formatting of strings", "[tokenize]")
+TEST_CASE("Test define", "[environment]")
 {
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(define a 42)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == 42);
+}
 
+TEST_CASE("Test if", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(if (< 1 2) 13 14)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == 13);
+}
+
+TEST_CASE("Test begin", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(begin (define a 42) (if (< 1 2) 13 14))";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == 13);
+}
+
+
+TEST_CASE("Test +", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(+ 1 14)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == 15);
+}
+
+TEST_CASE("Test negate", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(begin (define a 1) (- a) )";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == -1);
+}
+
+
+TEST_CASE("Test negate 2", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(- 2)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == -2);
+}
+
+
+TEST_CASE("Test subtraction", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(- 3 2)";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.double_value == 1);
+}
+
+
+TEST_CASE("Test and", "[environment]")
+{
+	Interpreter Interp;
+	Expression output;
+	std::string in = "(begin (define a True) (define b True) (and a b))";
+	std::istringstream input(in);
+	Interp.parse(input);
+	output = Interp.eval();
+	REQUIRE(output.Node.bool_value == true);
 }
