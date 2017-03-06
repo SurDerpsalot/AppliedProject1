@@ -207,11 +207,13 @@ Expression Interpreter::eval()
 	Expression result;
 	try {
 		result = Enviro.Operations(*Root);
+		destroyTree(Root);
+		Root = NULL;
 	}
 	catch (InterpreterSemanticError & ERR)
 	{
 		throw ERR;
 	}
-	destroyTree(Root);
+	
 	return result;
 }

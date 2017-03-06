@@ -227,13 +227,13 @@ TEST_CASE( "Test Interpreter special forms: begin and define", "[interpreter]" )
     Expression result = run(program);
     REQUIRE(result == Expression(42.));
   }
-
+  
   {
     std::string program = "(begin (define answer 42)\n(answer))";
     Expression result = run(program);
     REQUIRE(result == Expression(42.));
   }
- 
+  
   {
     std::string program = "(begin (define answer (+ 9 11)) (answer))";
     Expression result = run(program);

@@ -314,7 +314,6 @@ Expression Environment::NonSpec(Expression Top)
 	Expression temp;
 	if (!checkProcedure(Top))
 	{
-		std::map<std::string, Expression>::iterator found;
 		found = Dictionary.find(Top.Node.string_value);
 		if(found != Dictionary.end())
 			temp = Dictionary.at(Top.Node.string_value);
@@ -536,22 +535,15 @@ Expression Environment::EnvAdd(Expression Top)
 {
 	Expression Ex1;
 	Expression Ex2;
-	Ex1 = *Top.Node.Branch.at(0);
-	if (Ex1.Node.type == Bool)
-	{
-		throw InterpreterSemanticError("Error: cannot add a Bool");
-		return Error;
-	}
-	else
-	{
-		if (Ex1.Node.type == Symbol)
-			Ex1 = ProType(Ex1);
-		for (size_t i = 1; i < Top.Node.Branch.size(); i++)
+	Expression Zero;
+	Ex1.Node.type = Value;
+	Ex1.Node.double_value = 0;
+		for (size_t i = 0; i < Top.Node.Branch.size(); i++)
 		{
 			Ex2 = *Top.Node.Branch.at(i);
 			if (Ex2.Node.type == Symbol)
 			{
-				Ex2 = ProType(Ex1);
+				Ex2 = ProType(Ex2);
 			}
 			if (Ex2.Node.type == Bool)
 			{
@@ -563,7 +555,6 @@ Expression Environment::EnvAdd(Expression Top)
 				Ex1.Node.double_value = Ex2.Node.double_value + Ex1.Node.double_value;
 			}
 		}
-	}
 	return Ex1;
 }
 
