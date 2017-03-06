@@ -191,6 +191,7 @@ void Interpreter::destroyTree(Expression* curLevel) {
 		{
 			destroyTree(curLevel->Node.Branch[childIndex]);
 		}
+		delete curLevel;
 		curLevel = NULL;
 	}
 	return;
